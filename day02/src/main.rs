@@ -95,7 +95,6 @@ mod tests {
 
         assert!("forward a".parse::<Instruction>().is_err());
         assert!("unknown 1".parse::<Instruction>().is_err());
-        assert!("forward 1".parse::<Instruction>().is_err());
     }
 
     #[test]
