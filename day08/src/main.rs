@@ -8,11 +8,14 @@ fn parse_input(input: &str) -> impl Iterator<Item = (Vec<Signal>, Vec<Signal>)> 
 
         let mut signals = a
             .split_whitespace()
-            .map(|s| s.chars().collect())
+            .map(|s| BTreeSet::from_iter(s.chars()))
             .collect::<Vec<Signal>>();
         signals.sort_by_key(|a| a.len());
 
-        let outputs = b.split_whitespace().map(|s| s.chars().collect()).collect();
+        let outputs = b
+            .split_whitespace()
+            .map(|s| BTreeSet::from_iter(s.chars()))
+            .collect();
 
         (signals, outputs)
     })
