@@ -26,7 +26,7 @@ fn part1(input: &str) -> usize {
         .count()
 }
 
-fn decode(signals: Vec<Signal>, outputs: Vec<Signal>) -> usize {
+fn decode(signals: &[Signal], outputs: &[Signal]) -> usize {
     let mut digits = (0..=9).map(|_| Signal::new()).collect::<Vec<Signal>>();
     digits[1] = signals[0].clone();
     digits[7] = signals[1].clone();
@@ -56,7 +56,7 @@ fn decode(signals: Vec<Signal>, outputs: Vec<Signal>) -> usize {
     }
 
     let mut num = 0;
-    for output in &outputs {
+    for output in outputs.iter() {
         for (i, digit) in digits.iter().enumerate() {
             if digit == output {
                 num = num * 10 + i;
@@ -68,7 +68,7 @@ fn decode(signals: Vec<Signal>, outputs: Vec<Signal>) -> usize {
 }
 
 fn part2(input: &str) -> usize {
-    parse_input(input).map(|(s, o)| decode(s, o)).sum()
+    parse_input(input).map(|(s, o)| decode(&s, &o)).sum()
 }
 
 fn main() {
