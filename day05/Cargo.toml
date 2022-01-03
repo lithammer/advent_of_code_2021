@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 indoc = "1.0.3"
+sscanf = "0.1.4"

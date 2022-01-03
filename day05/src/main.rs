@@ -1,65 +1,70 @@
-use std::collections::HashMap;
+use std::{cmp::Ordering, collections::HashMap};
 
-#[derive(Default)]
-struct Counter(HashMap<(u32, u32), u8>);
+use sscanf::scanf;
 
-impl Counter {
-    fn inc(&mut self, line: Line) -> u32 {
-        let mut overlaps = 0;
+type Vents = HashMap<(i32, i32), u8>;
 
-        let Line { x1, x2, y1, y2 } = line;
-        if x1 == x2 || y1 == y2 {
-            for x in x1.min(x2)..=x1.max(x2) {
-                for y in y1.min(y2)..=y1.max(y2) {
-                    let v = self.0.entry((x, y)).or_insert(0);
-                    *v += 1;
-                    if v == &2 {
-                        overlaps += 1;
-                    }
-                }
-            }
+trait Counter {
+    fn inc(&mut self, line: Line);
+}
+
+impl Counter for Vents {
+    fn inc(&mut self, Line { x1, x2, y1, y2 }: Line) {
+        let dx = match x1.cmp(&x2) {
+            Ordering::Less => 1,
+            Ordering::Greater => -1,
+            Ordering::Equal => 0,
+        };
+        let dy = match y1.cmp(&y2) {
+            Ordering::Less => 1,
+            Ordering::Greater => -1,
+            Ordering::Equal => 0,
+        };
+
+        let mut x = x1;
+        let mut y = y1;
+
+        *self.entry((x, y)).or_insert(0) += 1;
+        while x != x2 || y != y2 {
+            x += dx;
+            y += dy;
+            *self.entry((x, y)).or_insert(0) += 1;
         }
-
-        overlaps
     }
 }
 
-#[derive(Debug)]
 struct Line {
-    x1: u32,
-    x2: u32,
-    y1: u32,
-    y2: u32,
+    x1: i32,
+    x2: i32,
+    y1: i32,
+    y2: i32,
 }
 
-#[allow(dead_code)]
-fn points(start: u32, stop: u32) -> impl Iterator<Item = u32> {
-    (start..=stop).chain((stop..=start).rev())
-}
-
-fn parse_input(input: &str) -> Vec<Line> {
+fn parse_input(input: &str) -> impl Iterator<Item = Line> + '_ {
     input
         .lines()
-        .map(|s| s.split_once(" -> ").unwrap())
-        .map(|(a, b)| (a.split_once(',').unwrap(), b.split_once(',').unwrap()))
-        .map(|((a, b), (c, d))| Line {
-            x1: a.parse().unwrap(),
-            x2: c.parse().unwrap(),
-            y1: b.parse().unwrap(),
-            y2: d.parse().unwrap(),
-        })
-        .collect()
+        .map(|s| scanf!(s, "{},{} -> {},{}", i32, i32, i32, i32).unwrap())
+        .map(|(x1, y1, x2, y2)| Line { x1, x2, y1, y2 })
 }
 
-fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> i32 {
     let lines = parse_input(input);
 
-    let mut counter = Counter::default();
-    lines.into_iter().map(|l| counter.inc(l)).sum()
+    let mut vents = Vents::default();
+    lines
+        .filter(|Line { x1, x2, y1, y2 }| x1 == x2 || y1 == y2) // Filter diagonal lines.
+        .for_each(|line| vents.inc(line));
+
+    vents.values().filter(|&v| *v >= 2).count() as i32
 }
 
-fn part2(_input: &str) -> u32 {
-    todo!()
+fn part2(input: &str) -> i32 {
+    let lines = parse_input(input);
+
+    let mut counter = Vents::default();
+    lines.for_each(|l| counter.inc(l));
+
+    counter.values().filter(|&v| *v >= 2).count() as i32
 }
 
 fn main() {
