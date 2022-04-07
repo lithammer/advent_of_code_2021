@@ -6,5 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-indoc = "1.0.3"
 sscanf = "0.1.4"
+
+[dev-dependencies]
+indoc = "1.0.4"
